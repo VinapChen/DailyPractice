@@ -2,13 +2,13 @@
 import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QWidget, QLCDNumber, QSlider,
-                             QVBoxLayout, QApplication)
+                             QVBoxLayout, QApplication,QLabel)
 
 
 class Example(QWidget):
 
     def __init__(self):
-        super().__init__()
+        super(Example,self).__init__()
 
         self.initUI()
 
@@ -29,6 +29,20 @@ class Example(QWidget):
         self.setWindowTitle('Signal & slot')
         self.show()
 
+
+class MyWindow(QWidget):
+    def __init__(self):
+        super(QWidget,self).__init__()
+
+def show_mywindow():
+    app = QApplication(sys.argv)
+    mywindows = MyWindow()
+    QLabel(mywindows).setText("<p style='color: red; margin-left: 20px'><b>hell world</b></p>")
+    mywindows.show()
+    # app.exec_()
+    sys.exit(app.exec_())
+
+# show_mywindow()
 
 if __name__ == '__main__':
 
