@@ -3,3 +3,4 @@ __init__.py
 *.xml
 .idea/my_LC_test.iml
 *.pyc
+venv/*
