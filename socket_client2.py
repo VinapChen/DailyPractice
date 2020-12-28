@@ -34,7 +34,8 @@ if __name__ == '__main__':
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     # 连接服务端
-    s.connect(('127.0.0.1', 1884))
+    # s.connect(('127.0.0.1', 8899))
+    s.connect(('182.92.1.50', 8899))
     # s.connect(('101.200.89.11', 1884))
 
     # 请求 | 发送数据到服务端
@@ -50,18 +51,51 @@ if __name__ == '__main__':
     # print hex_code
 
     string = ''
-    tmp1 = re.findall(r'.{2}', hex_code)
+    tmp1 = re.findall(r'.{2}', "0003")
     for r in range(len(tmp1)):
         string += struct.pack('B',int(tmp1[r],16))
 
-    my_bytes = bytearray(string)
-    print "package data:",dec2hex4string(my_bytes)
+    string2 = ''
+    tmp2 = re.findall(r'.{2}', "11223344")
+    for r in range(len(tmp2)):
+        string2 += struct.pack('B', int(tmp2[r], 16))
 
-    s.sendall(string)
+    print(string)
+    string1 = "CfS*01020304052*0003*CON"
+    print (string1)
+
+    my_bytes = bytearray(string1)
+    print ("package data:",dec2hex4string(my_bytes))
+
+    s.sendall(my_bytes)
     # 响应 | 接受服务端返回到数据
-#     data = s.recv(1024)
-#     my_bytes = bytearray(data)
-#     print(len(data),dec2hex4string(my_bytes))
+    cer = []
+    while 1:
+        data = s.recv(4096)
+        my_bytes = bytearray(data)
+        print(len(data),dec2hex4string(my_bytes))
+        part = 1;
+        if(len(my_bytes) > 1833):
+
+            cer = my_bytes[24:]
+            print (len(my_bytes[24:]),dec2hex4string(my_bytes[24:]))
+            f = open('/Users/yunba/Downloads/output.p12', 'wb')
+            f.write(cer)
+            f.close()
+        elif (part == 1):
+            cer = my_bytes[24:]
+            part = 2
+        elif (part == 2):
+            cer = cer + my_bytes
+            print (len(cer), dec2hex4string(cer))
+            f = open('/Users/yunba/Downloads/output.p12', 'wb')
+            f.write(cer)
+            f.close()
+            part = 1
+
+
 
     # 关闭 socket
     s.close()
+
+

@@ -97,7 +97,7 @@ def send_package(command):
     heart_beat = "000200000221011671230004"
 
 
-    imei = "867584031521427"
+    imei = "867584031521425"
     msg_q = "*SCOR,OM,%s,Q0,414,99,31#\n" % imei
     msg_r = "*SCOS,OM,123456789123456,R0,0,20,1234,1566200630#\n"
     msg_l = "*SCOS,OM,123456789123456,L0,55,1234,1566200630#\n"
@@ -176,7 +176,7 @@ if __name__ == '__main__':
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     # 连接服务端
-    s.connect(('127.0.0.1', 8082))
+    # s.connect(('127.0.0.1', 8082))
     # s.connect(('101.200.89.11', 20048))
 
     # 请求 | 发送数据到服务端

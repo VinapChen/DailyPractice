@@ -6,7 +6,7 @@ import time
 from threading import Timer
 import threading
 
-roomid = "19618817"
+roomid = "70325041"
 
 def dec2hex4string(val):
     """
@@ -39,7 +39,8 @@ def receive():
         msg_rec = client_ssl.ssock.recv(1024)
         print("rec:", str(msg_rec, encoding="utf-8"))
         if len(str(msg_rec, encoding="utf-8").split("*")) > 2 :
-            if len(str(msg_rec, encoding="utf-8").split("*")[2].split(",")) > 2:
+            if len(str(msg_rec, encoding="utf-8").split("*")[2].split(",")) > 2\
+                    and str(msg_rec, encoding="utf-8").split("*")[2].split(",")[0] == "VIDEO":
                 roomid = str(msg_rec, encoding="utf-8").split("*")[2].split(",")[2]
                 print("room id:", roomid)
     except socket.timeout as e:
@@ -90,7 +91,7 @@ def receive():
 
 
 def connect():
-    msg_con = "CS*865339003627922*0003*CON".encode("utf-8")
+    msg_con = "CS*865339003627917*0003*CON".encode("utf-8")
     client_ssl.ssock.send(msg_con)
     print("send:", msg_con)
     # 接收服务端返回的信息
@@ -117,12 +118,14 @@ def heartbeat():
 
 
 def send_command():
-    msg = "CS*865339003627922*0003*CON".encode("utf-8")
+    msg = "CS*865339003627917*0003*CON".encode("utf-8")
     msg_lk = "CS*0009*LK,0,0,83".encode("utf-8")
     msg_ud = "CS*0009*LK,0,0,83".encode("utf-8")
-    msg_ud2 = "CS*00BD*UD2,120118,070625,A,22.570720,N,113.8620167,E,2.12,188.6,0.0,9,100,51,14188,0,00000010,6,255,460,0,9360,5081,156,9360,4081,129,9360,4151,128,9360,5082,127,9360,4723,122,9360,4082,120,0,22.4".encode(
+    msg_ud2 = "CS*00BD*UD2,120118,070625,A,22.570720,N,113.8620167,E,2.12,188.6,0.0,9,100,12,14188,0,00000010,6,255,460,0,9360,5081,156,9360,4081,129,9360,4151,128,9360,5082,127,9360,4723,122,9360,4082,120,0,22.4".encode(
         "utf-8")
-    msg_al = "CS*00BC*AL,120118,070625,A,22.570720,N,113.8620167,E,2.20,188.6,0.0,9,100,51,14188,0,00010008,6,255,460,0,9360,5081,156,9360,4081,129,9360,4151,128,9360,5082,127,9360,4723,122,9360,4082,120,0,22.4".encode(
+    msg_ud2a = "CS*00BD*UD2,120118,070625,A,22.570720,N,113.7620167,E,2.12,188.6,0.0,9,100,12,14188,0,00000010,6,255,460,0,9360,5081,156,9360,4081,129,9360,4151,128,9360,5082,127,9360,4723,122,9360,4082,120,0,22.4".encode(
+        "utf-8")
+    msg_al = "CS*00BC*AL,120118,070625,A,22.570720,N,113.8620167,E,2.20,188.6,0.0,9,100,12,14188,0,00010008,6,255,460,0,9360,5081,156,9360,4081,129,9360,4151,128,9360,5082,127,9360,4723,122,9360,4082,120,0,22.4".encode(
         "utf-8")
     msg_pp = "CS*00D4*PP,091046,180916,085033,A,22.570193,N,113.8621950,E,0.48,60.3,0.0,9,100,100,0,0,00000010,7,255,460,1,9529,21809,160,9529,21405,133,9529,63555,133,9529,63554,124,9529,21242,119,9529,21151,118,9529,63574,116,0,23.2".encode(
         "utf-8")
@@ -138,8 +141,10 @@ def send_command():
     msg_rp = "CS*0008*rcapture".encode("utf-8")
     msg_video = "CS*0010*VIDEO,START,0001".encode("utf-8")
     global roomid
-    msg_endvideo = ("CS*0012*VIDEO,END,"+roomid).encode("utf-8")
+    msg_endvideo = ("CS*0008*ENDVIDEO").encode("utf-8")
     msg_members = "CS*0007*MEMBERS".encode("utf-8")
+    msg_bootoff = "CS*0015*BOOTOFF,1,07:00,00:00".encode("utf-8")
+    msg_tk = "CS*0015*TK,TOFF,1,07:00,00:00".encode("utf-8")
 
 
     ssock1 = client_ssl.ssock
@@ -161,6 +166,9 @@ def send_command():
         elif ("ud2" == com):
             ssock1.send(msg_ud2)
             print("send:", msg_ud2)
+        elif ("ud2a" == com):
+            ssock1.send(msg_ud2a)
+            print("send:", msg_ud2a)
 
             # 无回复
         elif ("al" == com):
@@ -204,11 +212,20 @@ def send_command():
             print("send:", msg_video)
         elif ("endvideo" == com):
             print(roomid)
-            ssock1.send(("CS*0012*VIDEO,END,"+roomid).encode("utf-8"))
-            print("send:", (("CS*0012*VIDEO,END,"+roomid).encode("utf-8")))
+            # ("CS*001"+str(len(roomid)+10-16)+"*VIDEO,END,"+roomid).encode("utf-8")
+            ssock1.send(msg_endvideo)
+            # ("CS*0012*VIDEO,END," + roomid).encode("utf-8")
+            print("send:", (msg_endvideo))
         elif ("members" == com):
             ssock1.send(msg_members)
             print("send:", msg_members)
+        elif ("bootoff" == com):
+            ssock1.send(msg_bootoff)
+            print("send:", msg_bootoff)
+
+        elif ("tk" == com):
+            ssock1.send(msg_tk)
+            print("send:", msg_tk)
 
         # time.sleep(0.5)
 
@@ -226,8 +243,8 @@ class client_ssl:
         # ssock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         # 连接服务端
-        # client_ssl.ssock.connect(('127.0.0.1', 7780))
         # ssock.connect(('182.92.1.50', 8899))
+        # client_ssl.ssock.connect(('127.0.0.1', 7780))
         client_ssl.ssock.connect(('116.63.128.9', 7780))
         client_ssl.ssock.setblocking(0)
         client_ssl.ssock.settimeout(10)
